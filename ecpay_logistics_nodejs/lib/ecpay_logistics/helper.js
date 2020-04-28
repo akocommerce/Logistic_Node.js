@@ -12,7 +12,24 @@ const https = require('https');
 // const EventEmitter = require('events').EventEmitter;
 
 class APIHelper {
-    constructor(){
+    constructor(params){
+        if (params) {
+            this.active_merc_info = params.Conf.MercProfile;
+            this.op_mode = params.Conf.OperatingMode;
+            this.contractor_stat = params.Conf.IsProjectContractor;
+            this.merc_info = params.Conf.MerchantInfo[this.active_merc_info];
+            this.ignore_payment = params.Conf.IgnorePayment;
+            if (this.merc_info) {
+                this.merc_id = this.merc_info["MerchantID"];
+                this.hkey = this.merc_info["HashKey"];
+                this.hiv = this.merc_info["HashIV"];
+            } else {
+                throw new Error(`Specified merchant setting name (${this.active_merc_info}) not found.`);
+            }
+            this.date = new Date();
+            console.log(this);
+            return;
+        }
         this.cont = fs.readFileSync(__dirname + '/../../conf/logistics_conf.xml').toString();
         this.cont_xml = et.parse(this.cont);
         this.active_merc_info = this.cont_xml.findtext('./MercProfile');
